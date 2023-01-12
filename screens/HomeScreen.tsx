@@ -1,6 +1,7 @@
 import React from 'react';
-import { Text, View, TouchableOpacity, FlatList } from 'react-native';
+import { Text, View, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import List from '../components/List';
 
 import styles from '../helpers/styles';
 
@@ -8,27 +9,19 @@ export default function HomeScreen({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
             <View style={{flex:1}}>
-                <View style={{ position: 'relative', paddingBottom: 24}}>
+                <View style={styles.headerContainer}>
+                    <Text style={styles.title}>Put it on the list</Text>
                     <TouchableOpacity
-                        title="+"
                         onPress={() => navigation.navigate('Add List')}
-                        style={{position: 'absolute', top:0, right:0, padding: 6, borderWidth: 2, borderColor: 'black' }}
+                        style={styles.addButton}
                     >
-                        <Text>+</Text>                    
+                        <Text style={styles.buttonText}>+</Text>
                     </TouchableOpacity>   
                 </View>
-                <TouchableOpacity
-                    style={{padding: 10}}
-                    onPress={() => navigation.navigate('List')}
-                >
-                    <Text>List 1</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={{padding: 10}}
-                    onPress={() => navigation.navigate('List')}
-                >
-                    <Text>List 2</Text>
-                </TouchableOpacity>
+                <ScrollView>
+                    <List />
+                    <List />
+                </ScrollView>
             </View>
         </SafeAreaView>
     )

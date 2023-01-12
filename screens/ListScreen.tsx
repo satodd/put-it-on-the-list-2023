@@ -1,14 +1,36 @@
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { Text, View, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
+import styles from '../helpers/styles';
+import ListItem from '../components/ListItem';
 
-export default function ListScreen({navigation}) {
+export default function ListScreen() {
     return (
-        <>
-            <Text>List</Text>
-                <Button
-                title="Go to Item"
-                onPress={() => navigation.navigate('Item')}
-            />
-        </>
+        <SafeAreaView style={styles.container}>
+            <View style={{borderBottomWidth: 2, paddingBottom: 12}}>
+                <Text style={{paddingBottom: 12, ...styles.listTitle}}>Currerntly consuming</Text>
+                <ScrollView
+                    pagingEnabled={true}
+                    horizontal={true}
+                >
+                    <View style={{borderWidth: 1, borderStyle: 'dashed'}}>
+                        <ListItem />
+                    </View>
+                    <View style={{borderWidth: 1, borderStyle: 'dashed'}}>
+                        <ListItem />
+                    </View>
+                    <View style={{borderWidth: 1, borderStyle: 'dashed'}}>
+                        <ListItem />
+                    </View>                                        
+                </ ScrollView>
+            </View>
+            <ScrollView>
+                <ListItem />
+                <ListItem />
+                <ListItem />
+                <ListItem />
+                <ListItem />
+            </ScrollView>
+        </SafeAreaView>
     )
 }

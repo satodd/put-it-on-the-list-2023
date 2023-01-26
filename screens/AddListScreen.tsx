@@ -12,7 +12,6 @@ export default function AddListScreen({ navigation }) {
     const [desc, onDescChange] = useState('');
 
     async function addList() {
-        console.log('add new list!');
         const db = getFirestore();
 
         const docRef = await addDoc(collection(db, 'lists'), {

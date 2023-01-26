@@ -20,7 +20,6 @@ function List({ list }) {
                 .catch((error) => console.log(error))
                 .then((res) => allTags.push(res));
 
-            console.log('allTags', allTags);
             setTags(allTags);
         }
 

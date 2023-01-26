@@ -1,20 +1,29 @@
-import React, {useState} from 'react';
-import { Text, View, Button, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import {
+    Text, View, Button, TextInput, TouchableOpacity,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+
 import styles from '../helpers/styles';
 
+export default function AddListScreen({ navigation }) {
+    const [name, onNameChange] = useState('');
+    const [desc, onDescChange] = useState('');
 
-export default function AddListScreen({navigation}) {
-    const [name, onNameChange] = React.useState('');
-    const [desc, onDescChange] = React.useState('');
+    async function addList() {
+        console.log('add new list!');
+        const db = getFirestore();
 
-    function addList() {
-        console.log("add new list!")
+        const docRef = await addDoc(collection(db, 'lists'), {
+            name,
+            desc,
+        });
     }
-    
+
     return (
         <SafeAreaView style={styles.container}>
-            <View style={{paddingBottom: 24}}>
+            <View style={{ paddingBottom: 24 }}>
                 <TextInput
                     style={styles.input}
                     placeholder="Name"
@@ -26,14 +35,16 @@ export default function AddListScreen({navigation}) {
                     placeholder="Description"
                     value={desc}
                     onChangeText={onDescChange}
-                />                
+                />
             </View>
             <TouchableOpacity
-                onPress={() => addList()}
-                style={{borderWidth: 1, width: '100%', padding: 12, display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                onPress={() => { addList(); }}
+                style={{
+                    borderWidth: 1, width: '100%', padding: 12, display: 'flex', justifyContent: 'center', alignItems: 'center',
+                }}
             >
                 <Text>Add New List</Text>
             </TouchableOpacity>
         </SafeAreaView>
-    )
+    );
 }

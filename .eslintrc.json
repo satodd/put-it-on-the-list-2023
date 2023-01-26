@@ -1,0 +1,52 @@
+{
+    "env": {
+        "browser": true,
+        "node": true,
+        "es2021": true,
+        "react-native/react-native": true
+    },
+    "extends": [
+        "plugin:react/recommended",
+        "airbnb"
+    ],
+    "overrides": [
+        {
+          "files": ["*.ts", "*.tsx"], // Your TypeScript files extension
+    
+          // As mentioned in the comments, you should extend TypeScript plugins here,
+          // instead of extending them outside the `overrides`.
+          // If you don't want to extend any rules, you don't need an `extends` attribute.
+          "extends": [
+            "plugin:@typescript-eslint/recommended",
+            "plugin:@typescript-eslint/recommended-requiring-type-checking"
+          ],
+    
+          "parserOptions": {
+            "project": ["./tsconfig.json"] // Specify it only for TypeScript files
+          }
+        }
+    ],
+    "plugins": [
+        "react-native",
+        "@typescript-eslint",
+        "react"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "sourceType": "module"
+    },
+    "rules": {
+        "react-native/no-unused-styles": 2,
+        "react-native/split-platform-components": 2,
+        "indent": ["error", 4],
+        "@typescript-eslint/explicit-function-return-type": 0,
+        "@typescript-eslint/strict-boolean-expressions": 0,
+        "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".ts"] }],
+        "react/jsx-indent": ["error", 4],
+        "react/jsx-indent-props": ["error", 4]
+    }
+}

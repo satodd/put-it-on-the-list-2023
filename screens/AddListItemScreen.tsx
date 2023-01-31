@@ -7,7 +7,8 @@ import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
 import styles from '../helpers/styles';
 
-export default function AddListScreen({ navigation }) {
+export default function AddListItemScreen({ navigation, route }) {
+    const {parentID} = route.params
     const [name, onNameChange] = useState('');
     const [desc, onDescChange] = useState('');
 
@@ -15,10 +16,11 @@ export default function AddListScreen({ navigation }) {
         const db = getFirestore();
         let creationDateTime = Date.now()
         
-        const docRef = await addDoc(collection(db, 'lists'), {
-            name,
-            desc,
-            creationDateTime
+        const docRef = await addDoc(collection(db, 'listItems'), {
+            name: name,
+            desc: desc,
+            creationDateTime: creationDateTime,
+            parent: parentID
         });
 
         navigation.navigate.goBack()

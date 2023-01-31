@@ -34,7 +34,7 @@ export default function HomeScreen({ navigation }) {
                 </View>
                 <ScrollView>
                     {lists && lists.map((list) => (
-                        <List list={list} key={list.name} />
+                        <List list={list} key={list.id} />
                     ))}
                 </ScrollView>
             </View>

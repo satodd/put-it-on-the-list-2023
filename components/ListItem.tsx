@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/core';
 import styles from '../helpers/styles';
 import Tag from './Tag';
 
-function ListItem() {
+function ListItem({ item }) {
     const navigation = useNavigation();
     const { width } = useWindowDimensions();
 
@@ -15,9 +15,12 @@ function ListItem() {
     return (
         <TouchableOpacity
             style={{ width: width - 28, padding: 6, ...styles.list }}
-            onPress={() => navigation.navigate('Item')}
+            onPress={() => navigation.navigate('Item', {
+                    item: item
+                })
+            }
         >
-            <Text style={styles.listTitle}>Item</Text>
+            <Text style={styles.listTitle}>{item?.data ? item.data.name : 'fix me'}</Text>
             <View style={{
                 display: 'flex', paddingTop: 8, flexDirection: 'row', flexWrap: 'wrap',
             }}

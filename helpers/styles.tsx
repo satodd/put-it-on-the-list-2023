@@ -57,4 +57,9 @@ export default StyleSheet.create({
         borderWidth: 1,
         padding: 10,
     },
+    tags: {
+        paddingVertical: 4, 
+        paddingHorizontal: 8, 
+        borderRadius: 100
+    }
 });

@@ -54,8 +54,8 @@ export default function ListScreen({ route, navigation }) {
                         horizontal
                     >
                         {currentlyConsuming.map((item) => (
-                            <View style={{ borderWidth: 1, borderStyle: 'dashed' }}>
-                                <ListItem item={item} key={item.id} />
+                            <View style={{ borderWidth: 1, borderStyle: 'dashed' }} key={item.id}>
+                                <ListItem item={item} />
                             </View>
                         ))}
                     </ScrollView>

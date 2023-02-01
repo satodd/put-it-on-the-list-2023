@@ -14,6 +14,7 @@ export default function HomeScreen({ navigation }) {
     useEffect(() => {
         async function getListData() {
             const rawLists = await getLists();
+            // rawLists.sort((a, b) => (a.data. > b ? -1 : 1))
             setLists(rawLists);
         }
 
@@ -30,6 +31,12 @@ export default function HomeScreen({ navigation }) {
                         style={styles.addButton}
                     >
                         <Text style={styles.buttonText}>+</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('Add Tag')}
+                        style={styles.addButton}
+                    >
+                        <Text style={styles.buttonText}>Tag</Text>
                     </TouchableOpacity>
                 </View>
                 <ScrollView>

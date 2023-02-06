@@ -12,26 +12,28 @@ function List({ list }) {
     const navigation = useNavigation();
 
     useEffect(() => {
-        async function getTagsData(tagRef) {
-            const allTags = [];
-
-            await getTag(tagRef)
-                .catch((error) => console.log(error))
-                .then((res) => allTags.push(res));
-
-            setTags(allTags);
+        async function getTagData(tagRef) {
+            let tag = await getTag(tagRef)
+            return tag
         }
 
         if (list.data.tags) {
+            let allTags = []
+
             list.data.tags.forEach((tagRef) => {
-                getTagsData(tagRef);
+                let tag = getTagData(tagRef);
+                allTags.push(tag)
             });
+
+            Promise.all(allTags).then((res)=> {
+                setTags(res)
+            })
         }
     }, []);
 
     return (
         <TouchableOpacity
-            style={styles.list}
+            style={{borderBottomWidth: 1, padding: 6, paddingVertical: 15,}}
             onPress={() => navigation.navigate('List', {
                 id: list.id,
                 name: list.data.name,

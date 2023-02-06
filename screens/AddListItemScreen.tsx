@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Text, View, Button, TextInput, TouchableOpacity, Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 
 import styles from '../helpers/styles';
 
-export default function AddListItemScreen({ navigation, route }) {
-    const {parentID} = route.params
+export default function AddListItemScreen({ navigation: { goBack }, route }) {
+    const {parentID, currentData} = route.params
+    const [mode, setMode] = useState('new');
     const [name, onNameChange] = useState('');
     const [desc, onDescChange] = useState('');
     const [location, onLocationChange] = useState('');
@@ -16,7 +17,7 @@ export default function AddListItemScreen({ navigation, route }) {
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
     //TODO move to api doc with useEffect
-    async function addList() {
+    async function addListItem() {
         const db = getFirestore();
         let creationDateTime = Date.now()
         
@@ -28,9 +29,40 @@ export default function AddListItemScreen({ navigation, route }) {
             parent: parentID
         });
 
-        navigation.navigate.goBack()
+        // navigation.navigate.goBack()
+        goBack()
+
     }
 
+    //TODO move to api doc with useEffect
+    async function editListItem() {
+        const db = getFirestore();
+        const listItemRef = doc(db, "listItems", currentData.id);
+
+        await updateDoc(listItemRef, {
+            name: name,
+            desc: desc,
+            location: location,
+            currentlyConsuming: isEnabled,
+            parent: parentID
+        });
+
+        setMode(null)
+
+        // navigation.navigate.goBack()
+        goBack()
+    }
+
+    useEffect(() => {
+        if (currentData) {
+            setMode('edit')
+            onNameChange(currentData.data.name)
+            onDescChange(currentData.data.desc)
+            onLocationChange(currentData.data.location)
+            setIsEnabled(currentData.data.currentlyConsuming)
+        }
+    }, [])
+    
     return (
         <SafeAreaView style={styles.container}>
             <View style={{ paddingBottom: 24 }}>
@@ -64,14 +96,26 @@ export default function AddListItemScreen({ navigation, route }) {
                 </View>
 
             </View>
-            <TouchableOpacity
-                onPress={() => { addList(); }}
-                style={{
-                    borderWidth: 1, width: '100%', padding: 12, display: 'flex', justifyContent: 'center', alignItems: 'center',
-                }}
-            >
-                <Text>Add New List Item</Text>
-            </TouchableOpacity>
+            {mode === 'edit' ?
+                <TouchableOpacity
+                    onPress={() => { editListItem(); }}
+                    style={{
+                        borderWidth: 1, width: '100%', padding: 12, display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    }}
+                >
+                    <Text>Edit List Item</Text>
+                </TouchableOpacity>
+            :
+                <TouchableOpacity
+                    onPress={() => { addListItem(); }}
+                    style={{
+                        borderWidth: 1, width: '100%', padding: 12, display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    }}
+                >
+                    <Text>Add New List Item</Text>
+                </TouchableOpacity>            
+            }
+            
         </SafeAreaView>
     );
 }

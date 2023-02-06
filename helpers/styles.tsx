@@ -23,7 +23,10 @@ export default StyleSheet.create({
     },
     list: {
         paddingVertical: 15,
-        borderBottomWidth: 1,
+        padding: 6,
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        justifyContent: 'center',
     },
     listTitle: {
         fontSize: 24,
@@ -31,7 +34,7 @@ export default StyleSheet.create({
     },
     tag: {
         borderWidth: 1, 
-        borderRadius: '100%', 
+        borderRadius: 100, 
         paddingHorizontal:6, 
         alignSelf: 'flex-start'
     },
@@ -49,7 +52,7 @@ export default StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         color: 'white',
-        fontSize: 30,
+        fontSize: 24,
     },
     input: {
         height: 40,
@@ -61,5 +64,32 @@ export default StyleSheet.create({
         paddingVertical: 4, 
         paddingHorizontal: 8, 
         borderRadius: 100
-    }
+    },
+    backTextWhite: {
+        color: '#FFF',
+    },
+    rowBack: {
+        alignItems: 'center',
+        backgroundColor: '#DDD',
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingLeft: 15,
+    },
+    backRightBtn: {
+        alignItems: 'center',
+        bottom: 0,
+        justifyContent: 'center',
+        position: 'absolute',
+        top: 0,
+        width: 75,
+    },
+    backRightBtnLeft: {
+        backgroundColor: 'blue',
+        right: 75,
+    },
+    backRightBtnRight: {
+        backgroundColor: 'red',
+        right: 0,
+    },
 });

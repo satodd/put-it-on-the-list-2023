@@ -1,5 +1,5 @@
 import {
-    getFirestore, collection, doc, addDoc, getDocs, getDoc, where, query, orderBy
+    getFirestore, collection, doc, addDoc, getDocs, getDoc, where, query, orderBy, deleteDoc
 } from 'firebase/firestore';
 
 const db = getFirestore();
@@ -23,11 +23,15 @@ export async function getLists() {
 
 export async function addList(name:string, desc:string, selectedTags:Array<any>) {
     let creationDateTime = Date.now()
+    
+    let tagRefs = selectedTags.map((tag) => {
+        return doc(db, 'tags/' + tag.id)
+    })
         
     const docRef = await addDoc(collection(db, 'lists'), {
         name: name,
         desc: desc,
-        tags: selectedTags,
+        tags: tagRefs,
         creationDateTime: creationDateTime
     });
 
@@ -58,7 +62,7 @@ export async function getTag(tag) {
 
 export async function getListItems(listID) {
     const listItemsRef = await collection(db, 'listItems')
-    const q = await query(listItemsRef, where("parent", "==", listID), orderBy("creationDateTime", "desc"));
+    const q = await query(listItemsRef, where("parent", "==", listID), orderBy("creationDateTime"));
 
     // const q = query(collection(db, "listItems"), where("parent", "==", listID));
     const querySnapshot = await getDocs(q);
@@ -73,4 +77,10 @@ export async function getListItems(listID) {
     });
 
     return items
+}
+
+export async function deleteListItem(listID:string) {
+    await deleteDoc(doc(db, "listItems", listID));
+
+    return 
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    TouchableOpacity, View, Text, useWindowDimensions,
+    TouchableOpacity, View, Text, useWindowDimensions, TouchableHighlight,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 
@@ -11,24 +11,28 @@ function ListItem({ item }) {
     const navigation = useNavigation();
     const { width } = useWindowDimensions();
 
-    // 28 = 12*2 from padding, + 2*2 from border
+    // width: 28 = 12*2 from padding, + 2*1 from border
+
     return (
-        <TouchableOpacity
-            style={{ width: width - 28, padding: 6, ...styles.list }}
+        <TouchableHighlight
+            style={{ width: width - 26, padding: 6, ...styles.list }}
             onPress={() => navigation.navigate('Item', {
                     item: item
                 })
             }
         >
-            <Text style={styles.listTitle}>{item?.data ? item.data.name : 'fix me'}</Text>
-            <View style={{
-                display: 'flex', paddingTop: 8, flexDirection: 'row', flexWrap: 'wrap',
-            }}
-            >
-                {/* <Tag />
-          <Tag /> */}
+            <View>
+                <Text style={styles.listTitle}>{item?.data ? item.data.name : 'fix me'}</Text>
+                <View style={{
+                    display: 'flex', paddingTop: 8, flexDirection: 'row', flexWrap: 'wrap',
+                }}
+                >
+                    {/* <Tag />
+            <Tag /> */}
+                </View>                
             </View>
-        </TouchableOpacity>
+
+        </TouchableHighlight>
     );
 }
 

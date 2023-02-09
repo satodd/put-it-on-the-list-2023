@@ -1,53 +1,64 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import {
+    Text, View, ScrollView, TouchableOpacity, Alert,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 import styles from '../helpers/styles';
 import ListItem from '../components/ListItem';
-import { getListItems, deleteListItem } from '../helpers/api';
+import { getListItems, deleteListItem, getDataFromReference } from '../helpers/api';
+import {
+    ListingProps, ListItemProps, ListProps, ListScreenRouteProps,
+} from '../helpers/types';
 
-export default function ListScreen({ route, navigation }) {
-    const {id, name, tags} = route.params
-    const [currentlyConsuming, setCurrentlyConsuming] = useState(null)
-    const [listItems, setListItems] = useState(null)
+function AddListItemButton(navigation, parentID) {
+    return (
+        (
+            <TouchableOpacity
+                onPress={() => navigation.navigate('Add List Item', {
+                    parentID,
+                    currentData: null,
+                })}
+                style={styles.addButton}
+            >
+                <Text style={styles.buttonText}>+</Text>
+            </TouchableOpacity>
+        )
+    );
+}
+
+export default function ListScreen({ route, navigation }):ListScreenRouteProps {
+    const { id, name, tags } = route.params;
+    const [currentlyConsuming, setCurrentlyConsuming] = useState<ListItemProps[]>(null);
+    const [listItems, setListItems] = useState<ListItemProps[]>(null);
 
     useEffect(() => {
         async function getItems() {
-            let allItems = await getListItems(id)
+            const allItems:ListItemProps[] = await getListItems(id)
                 .catch((error) => console.log(error))
-            
-            let currentlyConsumingRaw = allItems.filter((item) => {
-                if (item.data.currentlyConsuming) return item
-            })
+                .then((res) => getDataFromReference(res));
 
-            setCurrentlyConsuming(currentlyConsumingRaw ? currentlyConsumingRaw : null)
+            const currentlyConsumingRaw:ListItemProps[] = allItems.filter((item):ListItemProps => {
+                if (item.data.currentlyConsuming) return item;
+            });
+
+            setCurrentlyConsuming(currentlyConsumingRaw || null);
             setListItems(allItems);
         }
 
-        getItems()
-    
-    }, [])
+        getItems();
+    }, []);
 
     useEffect(() => {
         navigation.setOptions({
             title: name,
-            headerRight: () => (
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('Add List Item', {
-                        parentID: id,
-                        currentData: null
-                    })}
-                    style={styles.addButton}
-                >
-                    <Text style={styles.buttonText}>+</Text>
-                </TouchableOpacity>
-            ),
+            headerRight: () => (AddListItemButton(navigation, id)),
         });
-      }, [navigation]);
-    
+    }, [navigation]);
+
     async function deleteItem(id) {
-        await deleteListItem(id)
+        await deleteListItem(id);
     }
 
     function confirmDelete(id) {
@@ -58,22 +69,22 @@ export default function ListScreen({ route, navigation }) {
                 style: 'cancel',
             },
             {
-                text: 'Yes, delete it', 
-                onPress: () => deleteItem(id)
-            }
+                text: 'Yes, delete it',
+                onPress: () => deleteItem(id),
+            },
         ]);
     }
 
     function updateItem(item) {
         navigation.navigate('Add List Item', {
             parentID: id,
-            currentData: item
-        })
+            currentData: item,
+        });
     }
 
     const renderItem = (data) => (
-        <View style={{borderWidth: 1}}>
-            <ListItem item={data.item} key={data.id}/>
+        <View style={{ borderWidth: 1 }}>
+            <ListItem item={data.item} key={data.id} />
         </View>
     );
 
@@ -96,45 +107,55 @@ export default function ListScreen({ route, navigation }) {
 
     return (
         <SafeAreaView style={styles.container}>
-            {currentlyConsuming && currentlyConsuming.length > 0 &&
-                <View style={{ borderBottomWidth: 2, paddingBottom: 12 }}>
-                    <Text style={{ paddingBottom: 12, ...styles.listTitle }}>Currerntly consuming</Text>
-                    <ScrollView
-                        pagingEnabled
-                        horizontal
-                    >
-                        {currentlyConsuming.map((item) => (
-                            <View style={{ borderWidth: 1, borderStyle: 'dashed' }} key={item.id}>
-                                <ListItem item={item} />
-                            </View>
-                        ))}
-                    </ScrollView>
-                </View>
-            }
-            
-            <SwipeListView
-                data={listItems}
-                renderItem={renderItem}
-                renderHiddenItem={renderHiddenItem}
-                rightOpenValue={-150}
-                previewRowKey={'0'}
-                previewOpenValue={-40}
-                previewOpenDelay={3000}
-            />
+            {currentlyConsuming?.length > 0
+                && (
+                    <View style={{ borderBottomWidth: 2, paddingBottom: 12 }}>
+                        <Text style={{ paddingBottom: 12, ...styles.listTitle }}>
+                            Currently consuming
+                        </Text>
+                        <ScrollView
+                            pagingEnabled
+                            horizontal
+                        >
+                            {currentlyConsuming.map((item) => (
+                                <View style={{ borderWidth: 1, borderStyle: 'dashed' }} key={item.id}>
+                                    <ListItem item={item} />
+                                </View>
+                            ))}
+                        </ScrollView>
+                    </View>
+                )}
 
-            {!listItems || listItems.length === 0 &&
-                <View style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                    <Text>Looks like you have nothing on this list :( </Text>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('Add List Item', {
-                            parentID: id
-                        })}
-                        style={{}}
+            {listItems?.length > 0
+                && (
+                    <SwipeListView
+                        data={listItems}
+                        renderItem={renderItem}
+                        renderHiddenItem={renderHiddenItem}
+                        rightOpenValue={-150}
+                        previewRowKey="0"
+                        previewOpenValue={-40}
+                        previewOpenDelay={3000}
+                    />
+                )}
+
+            {!listItems || listItems.length === 0
+                && (
+                    <View style={{
+                        display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1,
+                    }}
                     >
-                        <Text style={{}}>Add an Item</Text>
-                    </TouchableOpacity>
-                </View>
-            }
+                        <Text>Looks like you have nothing on this list :( </Text>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('Add List Item', {
+                                parentID: id,
+                            })}
+                            style={{}}
+                        >
+                            <Text style={{}}>Add an Item</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
         </SafeAreaView>
     );
 }

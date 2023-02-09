@@ -1,86 +1,67 @@
 import {
-    getFirestore, collection, doc, addDoc, getDocs, getDoc, where, query, orderBy, deleteDoc
+    getFirestore, collection, doc, addDoc, getDocs, getDoc, where, query, orderBy, deleteDoc,
+    QuerySnapshot, DocumentData, CollectionReference, DocumentReference,
 } from 'firebase/firestore';
+import { ListProps, TagProps } from './types';
 
 const db = getFirestore();
 
-export async function getLists() {
-    const q = query(collection(db, "lists"), orderBy("creationDateTime", "desc"));
-    const docs = await getDocs(q);
+export function getDataFromReference(refs:QuerySnapshot<DocumentData>) {
+    const rawLists:ListProps[] | TagProps[] = [];
 
-    const rawLists = [];
-
-    docs.forEach((doc) => {
-        let rawData = {
-            id: doc.id,
-            data: doc.data()
-        }
+    refs.forEach((item) => {
+        const rawData:ListProps | TagProps = {
+            id: item.id,
+            data: item.data(),
+        };
         rawLists.push(rawData);
     });
 
     return rawLists;
 }
 
-export async function addList(name:string, desc:string, selectedTags:Array<any>) {
-    let creationDateTime = Date.now()
-    
-    let tagRefs = selectedTags.map((tag) => {
-        return doc(db, 'tags/' + tag.id)
-    })
-        
-    const docRef = await addDoc(collection(db, 'lists'), {
-        name: name,
-        desc: desc,
-        tags: tagRefs,
-        creationDateTime: creationDateTime
-    });
+export async function getLists():Promise<QuerySnapshot<DocumentData>> {
+    const q = query(collection(db, 'lists'), orderBy('creationDateTime', 'desc'));
+    const docs = await getDocs(q);
 
-    return
+    return docs;
+}
+
+export async function addList(name:string, desc:string, selectedTags:Array<CollectionReference>) {
+    const creationDateTime:number = Date.now();
+
+    const tagRefs:DocumentReference[] = selectedTags.map((tag) => doc(db, `tags/${tag.id}`));
+
+    await addDoc(collection(db, 'lists'), {
+        name,
+        desc,
+        tags: tagRefs,
+        creationDateTime,
+    });
 }
 
 export async function getAllTags() {
     const tagsRef = collection(db, 'tags');
     const docSnap = await getDocs(tagsRef);
 
-    const rawTags = [];
-
-    docSnap.forEach((doc) => {
-        let rawData = {
-            id: doc.id,
-            data: doc.data()
-        }
-        rawTags.push(rawData);
-    });
-
-    return rawTags
+    return docSnap;
 }
 
-export async function getTag(tag) {
+export async function getTag(tag:DocumentReference) {
     const docSnap = await getDoc(tag);
     return docSnap.data();
 }
 
-export async function getListItems(listID) {
-    const listItemsRef = await collection(db, 'listItems')
-    const q = await query(listItemsRef, where("parent", "==", listID), orderBy("creationDateTime"));
+export async function getListItems(listID: string) {
+    const listItemsRef = collection(db, 'listItems');
+    const q = query(listItemsRef, where('parent', '==', listID), orderBy('creationDateTime'));
 
     // const q = query(collection(db, "listItems"), where("parent", "==", listID));
     const querySnapshot = await getDocs(q);
-    let items = []
 
-    querySnapshot.forEach((doc) => {
-        let rawData = {
-            id: doc.id,
-            data: doc.data()
-        }
-        items.push(rawData);
-    });
-
-    return items
+    return querySnapshot;
 }
 
 export async function deleteListItem(listID:string) {
-    await deleteDoc(doc(db, "listItems", listID));
-
-    return 
+    await deleteDoc(doc(db, 'listItems', listID));
 }

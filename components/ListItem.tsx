@@ -7,7 +7,18 @@ import { useNavigation } from '@react-navigation/core';
 import styles from '../helpers/styles';
 import Tag from './Tag';
 
-function ListItem({ item }) {
+interface ItemProps {
+    item: {
+        id: string
+        data: {
+            name: string
+            desc: string
+
+        }
+    }
+}
+
+function ListItem({ item }: ItemProps) {
     const navigation = useNavigation();
     const { width } = useWindowDimensions();
 
@@ -17,9 +28,8 @@ function ListItem({ item }) {
         <TouchableHighlight
             style={{ width: width - 26, padding: 6, ...styles.list }}
             onPress={() => navigation.navigate('Item', {
-                    item: item
-                })
-            }
+                item,
+            })}
         >
             <View>
                 <Text style={styles.listTitle}>{item?.data ? item.data.name : 'fix me'}</Text>
@@ -29,7 +39,7 @@ function ListItem({ item }) {
                 >
                     {/* <Tag />
             <Tag /> */}
-                </View>                
+                </View>
             </View>
 
         </TouchableHighlight>

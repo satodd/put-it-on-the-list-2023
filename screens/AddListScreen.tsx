@@ -1,45 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Text, View, Button, TextInput, TouchableOpacity,
+    Text, View, TextInput, TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
 import styles from '../helpers/styles';
-import { addList, getAllTags } from '../helpers/api';
+import { addList, getAllTags, getDataFromReference } from '../helpers/api';
+import { TagProps } from '../helpers/types';
 
 export default function AddListScreen({ navigation: { goBack } }) {
     const [name, onNameChange] = useState('');
     const [desc, onDescChange] = useState('');
-    const [selectedTags, setSelectedTags] = useState([])
-    const [allTags, setAllTags] = useState(null);
+    const [selectedTags, setSelectedTags] = useState<TagProps[]>([]);
+    const [allTags, setAllTags] = useState<TagProps[]>(null);
 
     async function addNewList() {
-        await addList(name, desc, selectedTags)
-        goBack()
+        await addList(name, desc, selectedTags);
+        goBack();
     }
 
     useEffect(() => {
-      async function getTags() {
-        let tags = await getAllTags()
+        async function getTags() {
+            const rawTags = await getAllTags();
+            const tags:TagProps[] = getDataFromReference(rawTags);
 
-        setAllTags(tags)
-      }
+            setAllTags(tags);
+        }
 
-      getTags()
-    
-    }, [])
+        getTags()
+            .catch((error) => console.log('error', error));
+    }, []);
 
     function updateSelectedTags(newTag) {
         if (selectedTags.length === 0 || !selectedTags.includes(newTag)) {
-            let tags = selectedTags.slice()
-            tags.push(newTag)
-            setSelectedTags(tags)
+            const tags = selectedTags.slice();
+            tags.push(newTag);
+            setSelectedTags(tags);
         } else if (selectedTags.includes(newTag)) {
-            let tags = selectedTags.slice()
-            let index = tags.indexOf(newTag)
-            tags.splice(index, 1)
-            setSelectedTags(tags)
+            const tags = selectedTags.slice();
+            const index = tags.indexOf(newTag);
+            tags.splice(index, 1);
+            setSelectedTags(tags);
         }
     }
 
@@ -58,17 +59,17 @@ export default function AddListScreen({ navigation: { goBack } }) {
                     value={desc}
                     onChangeText={onDescChange}
                 />
-                <Text style={{marginBottom: 8}}>Tags:</Text>
-                <View style={{display: 'flex', flexWrap: 'wrap'}}>
+                <Text style={{ marginBottom: 8 }}>Tags:</Text>
+                <View style={{ display: 'flex', flexWrap: 'wrap' }}>
                     {allTags && allTags.map((tag) => (
-                        <TouchableOpacity 
-                            style={{...styles.tags, borderWidth: selectedTags.includes(tag) ? '2' : '1'}}
+                        <TouchableOpacity
+                            style={{ ...styles.tags, borderWidth: selectedTags.includes(tag) ? '2' : '1' }}
                             onPress={() => updateSelectedTags(tag)}
                             key={tag.id}
                         >
                             <Text>{tag.data.name}</Text>
                         </TouchableOpacity>
-                    ))}                    
+                    ))}
                 </View>
             </View>
             <TouchableOpacity

@@ -2,9 +2,10 @@ import 'dotenv/config'
 
 export default {
   "expo": {
-    "name": "put-it-on-the-list-2023",
-    "slug": "put-it-on-the-list-2023",
+    "name": "put-it-on-the-list",
+    "slug": "put-it-on-the-list",
     "version": "1.0.0",
+    "owner": "saatodd",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -37,7 +38,10 @@ export default {
       firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
       firebaseStorageBucket: process.env.FIREBASE_STORAGE_BUCKET,
       firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-      firebaseAppId: process.env.FIREBASE_APP_ID
+      firebaseAppId: process.env.FIREBASE_APP_ID,
+      "eas": {
+        "projectId": "abe52cd9-8666-47e3-bb13-257df6d4894f"
+      }
     }
   }
 }

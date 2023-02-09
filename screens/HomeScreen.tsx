@@ -5,7 +5,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import List from '../components/List';
-import { getLists } from '../helpers/api';
+import { getDataFromReference, getLists } from '../helpers/api';
 import styles from '../helpers/styles';
 
 export default function HomeScreen({ navigation }) {
@@ -13,8 +13,8 @@ export default function HomeScreen({ navigation }) {
 
     useEffect(() => {
         async function getListData() {
-            const rawLists = await getLists();
-            // rawLists.sort((a, b) => (a.data. > b ? -1 : 1))
+            const docs = await getLists();
+            const rawLists = getDataFromReference(docs);
             setLists(rawLists);
         }
 

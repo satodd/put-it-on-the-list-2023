@@ -8,7 +8,7 @@ import styles from '../helpers/styles';
 import { addList, getAllTags, getDataFromReference } from '../helpers/api';
 import { TagProps } from '../helpers/types';
 
-export default function AddListScreen({ navigation: { goBack } }) {
+export default function AddListScreen({ navigation }) {
     const [name, onNameChange] = useState('');
     const [desc, onDescChange] = useState('');
     const [selectedTags, setSelectedTags] = useState<TagProps[]>([]);
@@ -16,7 +16,7 @@ export default function AddListScreen({ navigation: { goBack } }) {
 
     async function addNewList() {
         await addList(name, desc, selectedTags);
-        goBack();
+        navigation.goBack();
     }
 
     useEffect(() => {

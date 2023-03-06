@@ -27,6 +27,7 @@ export interface ListItemProps {
         tags: DocumentReference[]
         location: string
         currentlyConsuming: boolean
+        parent: string
     }
 }
 
@@ -43,22 +44,22 @@ export interface ListingProps {
     list: ListProps
 }
 
-export interface AddListItemScreenProps {
-    route: {
-        params: {
-            parentID: string,
-            currentData: ListItemProps
-        }
-    }
-    navigation: ReactNavigation.RootParamList
-}
+// export interface AddListItemScreenProps {
+//     route: {
+//         params: {
+//             parentID: string,
+//             currentData: ListItemProps
+//         }
+//     }
+//     navigation: ReactNavigation.RootParamList
+// }
 
-export interface ListScreenRouteProps {
-    route: {
-        params: {
-            id: string
-            name: string
-            tags: TagProps[]
-        }
-    }
-}
+// export interface ListScreenRouteProps {
+//     route?: {
+//         params: {
+//             id: string
+//             name: string
+//             tags: TagProps[]
+//         }
+//     }
+// }

@@ -4,21 +4,27 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import { useNavigation } from '@react-navigation/native';
 
 import styles from '../helpers/styles';
 import ListItem from '../components/ListItem';
 import { getListItems, deleteListItem, getDataFromReference } from '../helpers/api';
 import {
-    ListingProps, ListItemProps, ListProps, ListScreenRouteProps,
+    ListItemProps, RootStackParamList,
 } from '../helpers/types';
+import { Props } from '../App';
 
-function AddListItemButton(navigation, parentID) {
+function AddListItemButton(parentID: string) {
+    // const navigation = useNavigation<ListScreenRouteProps>();
+    const navigation = useNavigation<RootStackParamList>();
+
     return (
         (
             <TouchableOpacity
-                onPress={() => navigation.navigate('Add List Item', {
+                onPress={() => navigation.navigate('AddListItem', {
                     parentID,
                     currentData: null,
+                    mode: 'new',
                 })}
                 style={styles.addButton}
             >
@@ -28,7 +34,7 @@ function AddListItemButton(navigation, parentID) {
     );
 }
 
-export default function ListScreen({ route, navigation }):ListScreenRouteProps {
+export default function ListScreen({ route, navigation }: Props) {
     const { id, name, tags } = route.params;
     const [currentlyConsuming, setCurrentlyConsuming] = useState<ListItemProps[]>(null);
     const [listItems, setListItems] = useState<ListItemProps[]>(null);
@@ -47,21 +53,22 @@ export default function ListScreen({ route, navigation }):ListScreenRouteProps {
             setListItems(allItems);
         }
 
-        getItems();
+        getItems()
+            .catch((error) => console.log(error));
     }, []);
 
     useEffect(() => {
         navigation.setOptions({
             title: name,
-            headerRight: () => (AddListItemButton(navigation, id)),
+            headerRight: () => (AddListItemButton(id)),
         });
     }, [navigation]);
 
-    async function deleteItem(id) {
-        await deleteListItem(id);
+    function deleteItem(itemID:string) {
+        deleteListItem(itemID).catch((error) => console.log(error));
     }
 
-    function confirmDelete(id) {
+    function confirmDelete(itemID:string) {
         Alert.alert('Confirm Deletion', 'Are you sure you want to delete this item?', [
             {
                 text: 'No, keep it',
@@ -70,25 +77,26 @@ export default function ListScreen({ route, navigation }):ListScreenRouteProps {
             },
             {
                 text: 'Yes, delete it',
-                onPress: () => deleteItem(id),
+                onPress: () => deleteItem(itemID),
             },
         ]);
     }
 
-    function updateItem(item) {
-        navigation.navigate('Add List Item', {
+    function updateItem(item: ListItemProps) {
+        navigation.navigate('AddListItem', {
             parentID: id,
             currentData: item,
+            mode: 'edit',
         });
     }
 
-    const renderItem = (data) => (
+    const renderItem = (data:ListItemProps) => (
         <View style={{ borderWidth: 1 }}>
             <ListItem item={data.item} key={data.id} />
         </View>
     );
 
-    const renderHiddenItem = (data) => (
+    const renderHiddenItem = (data:ListItemProps) => (
         <View style={styles.rowBack}>
             <TouchableOpacity
                 style={[styles.backRightBtn, styles.backRightBtnLeft]}
@@ -139,7 +147,7 @@ export default function ListScreen({ route, navigation }):ListScreenRouteProps {
                     />
                 )}
 
-            {!listItems || listItems.length === 0
+            {(!listItems || listItems.length === 0)
                 && (
                     <View style={{
                         display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1,
@@ -147,12 +155,14 @@ export default function ListScreen({ route, navigation }):ListScreenRouteProps {
                     >
                         <Text>Looks like you have nothing on this list :( </Text>
                         <TouchableOpacity
-                            onPress={() => navigation.navigate('Add List Item', {
+                            onPress={() => navigation.navigate('AddListItem', {
                                 parentID: id,
                             })}
-                            style={{}}
+                            style={{
+                                paddingHorizontal: 12, paddingVertical: 8, marginTop: 24, backgroundColor: 'green',
+                            }}
                         >
-                            <Text style={{}}>Add an Item</Text>
+                            <Text style={{ color: 'white' }}>Add an Item</Text>
                         </TouchableOpacity>
                     </View>
                 )}

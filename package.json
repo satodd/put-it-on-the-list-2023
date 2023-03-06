@@ -24,6 +24,7 @@
     "react-native-screens": "~3.18.0",
     "react-native-svg": "13.4.0",
     "react-native-swipe-list-view": "^3.2.9",
+    "react-native-wheel-color-picker": "^1.2.0",
     "typescript": "^4.6.3"
   },
   "devDependencies": {

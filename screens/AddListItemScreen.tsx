@@ -1,63 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Text, View, Button, TextInput, TouchableOpacity, Switch,
+    Text, View, TextInput, TouchableOpacity, Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-    getFirestore, collection, addDoc, updateDoc, doc,
-} from 'firebase/firestore';
 
 import styles from '../helpers/styles';
-import { AddListItemScreenProps } from '../helpers/types';
+import { Props } from '../App';
+import { addListItem, editListItem } from '../helpers/api';
 
-export default function AddListItemScreen({ navigation, route }:AddListItemScreenProps) {
-    const { parentID, currentData } = route.params;
-    const [mode, setMode] = useState<string>('new');
+export default function AddListItemScreen({ navigation, route }:Props) {
+    const { parentID, currentData, mode } = route.params;
+    // const [mode, setMode] = useState<string>('new');
     const [name, onNameChange] = useState<string>('');
     const [desc, onDescChange] = useState<string>('');
     const [location, onLocationChange] = useState<string>('');
     const [isEnabled, setIsEnabled] = useState<boolean>(false);
     const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
-    // TODO move to api doc with useEffect
-    async function addListItem() {
-        const db = getFirestore();
-        const creationDateTime = Date.now();
-
-        await addDoc(collection(db, 'listItems'), {
-            name,
-            desc,
-            creationDateTime,
-            currentlyConsuming: isEnabled,
-            parent: parentID,
-        });
-
-        navigation.navigate.goBack();
-        // goBack();
+    async function addNewListItem() {
+        await addListItem(name, desc, location, isEnabled, parentID);
+        navigation.goBack();
     }
 
-    // TODO move to api doc with useEffect
-    async function editListItem() {
-        const db = getFirestore();
-        const listItemRef = doc(db, 'listItems', currentData.id);
-
-        await updateDoc(listItemRef, {
-            name,
-            desc,
-            location,
-            currentlyConsuming: isEnabled,
-            parent: parentID,
-        });
-
-        setMode(null);
-
-        navigation.navigate.goBack();
-        // goBack();
+    async function editCurrentListItem() {
+        await editListItem(currentData.id, name, desc, location, isEnabled, parentID);
+        navigation.goBack();
     }
 
     useEffect(() => {
+        navigation.setOptions({
+            title: mode === 'new' ? 'Add New' : `Edit ${name}`,
+        });
+    }, []);
+
+    useEffect(() => {
         if (currentData) {
-            setMode('edit');
             onNameChange(currentData.data.name);
             onDescChange(currentData.data.desc);
             onLocationChange(currentData.data.location);
@@ -87,7 +64,7 @@ export default function AddListItemScreen({ navigation, route }:AddListItemScree
                     onChangeText={onLocationChange}
                 />
                 <View>
-                    <Text>Currently Consuming?</Text>
+                    <Text style={{ marginBottom: 6 }}>Currently Consuming?</Text>
                     <Switch
                         trackColor={{ false: '#767577', true: '#81b0ff' }}
                         thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
@@ -101,7 +78,9 @@ export default function AddListItemScreen({ navigation, route }:AddListItemScree
             {mode === 'edit'
                 ? (
                     <TouchableOpacity
-                        onPress={() => { editListItem(); }}
+                        onPress={() => {
+                            editCurrentListItem().catch((error) => console.log(error));
+                        }}
                         style={{
                             borderWidth: 1, width: '100%', padding: 12, display: 'flex', justifyContent: 'center', alignItems: 'center',
                         }}
@@ -111,7 +90,9 @@ export default function AddListItemScreen({ navigation, route }:AddListItemScree
                 )
                 : (
                     <TouchableOpacity
-                        onPress={() => { addListItem(); }}
+                        onPress={() => {
+                            addNewListItem().catch((error) => console.log(error));
+                        }}
                         style={{
                             borderWidth: 1, width: '100%', padding: 12, display: 'flex', justifyContent: 'center', alignItems: 'center',
                         }}

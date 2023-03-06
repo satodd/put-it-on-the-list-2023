@@ -1,6 +1,6 @@
 import {
     getFirestore, collection, doc, addDoc, getDocs, getDoc, where, query, orderBy, deleteDoc,
-    QuerySnapshot, DocumentData, CollectionReference, DocumentReference,
+    QuerySnapshot, DocumentData, CollectionReference, DocumentReference, updateDoc,
 } from 'firebase/firestore';
 import { ListProps, TagProps } from './types';
 
@@ -64,4 +64,29 @@ export async function getListItems(listID: string) {
 
 export async function deleteListItem(listID:string) {
     await deleteDoc(doc(db, 'listItems', listID));
+}
+
+export async function addListItem(name, desc, location, currentlyConsuming, parentID) {
+    const creationDateTime = Date.now();
+
+    await addDoc(collection(db, 'listItems'), {
+        name,
+        desc,
+        location,
+        creationDateTime,
+        currentlyConsuming,
+        parentID,
+    });
+}
+
+export async function editListItem(id, name, desc, location, currentlyConsuming, parentID) {
+    const listItemRef = doc(db, 'listItems', id);
+
+    await updateDoc(listItemRef, {
+        name,
+        desc,
+        location,
+        currentlyConsuming,
+        parent: parentID,
+    });
 }
